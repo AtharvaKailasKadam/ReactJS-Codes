@@ -1,35 +1,13 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
-function App() {
-  const [count, setCount] = useState(0)
-
+export let App = () => {
   return (
-    <>
+    <div>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <img src = "GOT.jpg" alt = "GOT" width = "50%" height = "50%" />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+      <h2> Name: Game of Thrones. </h2>
+      <h3> Season: 8</h3>
+      <p> <b>Game of Thrones</b> is an epic fantasy television series based on George R.R. Martin’s book series A Song of Ice and Fire. Set in the fictional continents of Westeros and Essos, the story follows the power struggles among noble families as they vie for control of the Iron Throne. Blending political intrigue, war, betrayal, and mythical elements like dragons and White Walkers, the series explores themes of loyalty, ambition, and survival. Known for its complex characters, unexpected plot twists, and morally grey choices, Game of Thrones captivated a global audience and became one of the most iconic TV shows of the 21st century.</p>
+    </div>
+  );
+};
 
-export default App

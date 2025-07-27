@@ -1,20 +1,13 @@
 // Now Using the React Fragments.
 
 // This import Name as 'NetflixSeries' can be anything.
-import { NetflixSeries, Footer, Header } from "./components/NetflixSeries";
+import { NetflixSeries } from "./components/NetflixSeries";
 
 export let App = () => {
   return (
     // Can also use the '<Fragment>  </Fragment>' as a Parent div.
     <>
-      <Header />
       <NetflixSeries />
-      <NetflixSeries />
-      <NetflixSeries />
-      <NetflixSeries />
-      <NetflixSeries />
-      <NetflixSeries />
-      <Footer />
     </>
   );
 };

@@ -1,38 +1,27 @@
+import seriesData from "../api/seriesData.json";
+
+// Map method i.e. 'map()' is Must in this Implementation.
 export const NetflixSeries = () => {
-const Name = "Game of Thrones";
-const Seasons = 8;
-const Ratings = 9.2;
 return (
-    <div>
-        <div>
-            <img src = "GOT.jpg" alt = "GOT" width = "40%" height = "40%" />
-        </div>
-        <h1> Name: {Name} </h1>
-        <h3> Seasons : {Seasons} </h3>
-        <h3> Ratings : {Ratings}/10 </h3>
-        <h3> Genre : {GenreFun()} </h3>
-        <p> <b>Game of Thrones :</b> is an epic fantasy television series based on George R.R. Martin’s book series A Song of Ice and Fire. Set in the fictional continents of Westeros and Essos, the story follows the power struggles among noble families as they vie for control of the Iron Throne. Blending political intrigue, war, betrayal, and mythical elements like dragons and White Walkers, the series explores themes of loyalty, ambition, and survival. Known for its complex characters, unexpected plot twists, and morally grey choices, Game of Thrones captivated a global audience and became one of the most iconic TV shows of the 21st century.</p>
-    </div>
-)
+    <ul>
+        {seriesData.map(curElem => {
+                return(
+                    <li key = {curElem.id}>
+                        <div>
+                            <h1>Name: {curElem.name} </h1>
+                            <div>
+                                <img src = {curElem.imgUrl} alt = "GOT" width = "40%" height = "40%" />
+                            </div>
+                            <h3> Seasons : {curElem.season} </h3>
+                            <h3> Episodes : {curElem.episode} </h3>
+                            <h3> Ratings : {curElem.rating}/10 </h3>
+                            <p> Genre : {curElem.genre} </p>
+                            <p> Description : {curElem.description}</p>
+                            <a href = {curElem.watchUrl} target = "_blank"> <button>Watch Now</button> </a>
+                        </div>
+                    </li>
+                );
+            })}
+    </ul>
+);
 }
-function GenreFun ()
-{
-    return "Action , Drama , Action , Adventure";
-}
-
-export const Footer = () =>{
-    return(
-        <h3> <b>COPYRIGHT :</b> atharvakadam@2002 </h3>
-    )
-}
-
-
-export const Header = () =>{
-    return(
-        <h3> <b>COPYRIGHT :</b> From : atharvakadam@2002 </h3>
-    )
-}
-
-// This is how u should build the Components in the JSX file.
-
-// export default NetflixSeries

@@ -11,9 +11,6 @@ return (
 )
 };
 
-
-
-
 let age = prompt("Enter Your Age: ");
 const NetflixSeries = () =>
 {
@@ -43,3 +40,6 @@ function GenreFun ()
 }
 
 // Conditionals in JSX
+
+// Using the Loops in React i.e. '.map()' method.
+

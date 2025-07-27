@@ -1,0 +1,57 @@
+[
+    {
+        "imgUrl": "DemonSlayer.jpg",
+        "name": "Demon Slayer",
+        "id": "Demon-Slayer",
+        "season": "10",
+        "episode": "120",
+        "genre": "Action, Thriller, Adventure",
+        "rating": "9.8",
+        "description": "Demon Slayer is a Japanese media franchise that consists of a manga series, an original video game, and live-action TV series. The manga series is set in a world where humanoids called demons exist, and the only way to stop them is by slaying them.",
+        "watchUrl": "https://www.crunchyroll.com/demon-slayer"
+    },
+    {
+        "imgUrl": "OnePiece.jpg",
+        "name": "One Piece",
+        "id": "One-Piece",
+        "season": "10",
+        "episode": "120",
+        "genre": "Action, Thriller, Adventure",
+        "rating": "9.8",
+        "description": "One Piece is a Japanese media franchise that consists of a manga series, an original video game, and live-action TV series. The manga series is set in a world where humanoids called demons exist, and the only way to stop them is by slaying them.",
+        "watchUrl": "https://www.crunchyroll.com/one-piece"
+    },
+    {
+        "imgUrl": "AttackonTitan.jpg",
+        "name": "Attack on Titan",
+        "id": "Attack-on-Titan",
+        "season": "10",
+        "episode": "120",
+        "genre": "Action, Thriller, Adventure",
+        "rating": "9.8",
+        "description": "Attack on Titan is a Japanese media franchise that consists of a manga series, an original video game, and live-action TV series. The manga series is set in a world where humanoids called demons exist, and the only way to stop them is by slaying them.",
+        "watchUrl": "https://www.crunchyroll.com/attack-on-titan"
+    },
+    {
+        "imgUrl": "MyHeroAcademia.jpg",
+        "name": "My Hero Academia",
+        "id": "My-Hero-Academia",
+        "season": "10",
+        "episode": "120",
+        "genre": "Action, Thriller, Adventure",
+        "rating": "9.8",
+        "description": "My Hero Academia is a Japanese media franchise that consists of a manga series, an original video game, and live-action TV series. The manga series is set in a world where humanoids called demons exist, and the only way to stop them is by slaying them.",
+        "watchUrl": "https://www.crunchyroll.com/my-hero-academia"
+    },
+    {
+        "imgUrl": "OnePunchMan.jpg",
+        "name": "One Punch Man",
+        "id": "One-Punch-Man",
+        "season": "10",
+        "episode": "120",
+        "genre": "Action, Thriller, Adventure",
+        "rating": "9.8",
+        "description": "One Punch is a Japanese media franchise that consists of a manga series, an original video game, and live-action TV series. The manga series is set in a world where humanoids called demons exist, and the only way to stop them is by slaying them.",
+        "watchUrl": "https://www.crunchyroll.com/one-punch"
+    }
+]

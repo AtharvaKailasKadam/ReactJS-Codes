@@ -1,7 +1,7 @@
 export const SeriesCard = (props) => {
     const {id, name, imgUrl, season, episode, rating, genre, description, watchUrl} = props.data;
     return(
-        <li className ="anime-card" key = {id}>
+        <li className = "anime-card" key = {id}>
             <div>
                 <h1>Name: {name} </h1>
                 <div>

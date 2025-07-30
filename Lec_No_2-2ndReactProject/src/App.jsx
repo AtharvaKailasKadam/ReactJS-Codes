@@ -6,9 +6,9 @@ import { NetflixSeries } from "./components/NetflixSeries";
 export let App = () => {
   return (
     // Can also use the '<Fragment>  </Fragment>' as a Parent div.
-    <>
+    <section className = "container">
       <NetflixSeries />
-    </>
+    </section>
   );
 };
 

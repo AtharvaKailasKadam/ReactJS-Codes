@@ -1,57 +1,167 @@
 [
-    {
-        "imgUrl": "DemonSlayer.jpg",
-        "name": "Demon Slayer",
-        "id": "Demon-Slayer",
-        "season": "10",
-        "episode": "120",
-        "genre": "Action, Thriller, Adventure",
-        "rating": "9.8",
-        "description": "Demon Slayer is a Japanese media franchise that consists of a manga series, an original video game, and live-action TV series. The manga series is set in a world where humanoids called demons exist, and the only way to stop them is by slaying them.",
-        "watchUrl": "https://www.crunchyroll.com/demon-slayer"
-    },
-    {
-        "imgUrl": "OnePiece.jpg",
-        "name": "One Piece",
-        "id": "One-Piece",
-        "season": "10",
-        "episode": "120",
-        "genre": "Action, Thriller, Adventure",
-        "rating": "9.8",
-        "description": "One Piece is a Japanese media franchise that consists of a manga series, an original video game, and live-action TV series. The manga series is set in a world where humanoids called demons exist, and the only way to stop them is by slaying them.",
-        "watchUrl": "https://www.crunchyroll.com/one-piece"
-    },
-    {
-        "imgUrl": "AttackonTitan.jpg",
-        "name": "Attack on Titan",
-        "id": "Attack-on-Titan",
-        "season": "10",
-        "episode": "120",
-        "genre": "Action, Thriller, Adventure",
-        "rating": "9.8",
-        "description": "Attack on Titan is a Japanese media franchise that consists of a manga series, an original video game, and live-action TV series. The manga series is set in a world where humanoids called demons exist, and the only way to stop them is by slaying them.",
-        "watchUrl": "https://www.crunchyroll.com/attack-on-titan"
-    },
-    {
-        "imgUrl": "MyHeroAcademia.jpg",
-        "name": "My Hero Academia",
-        "id": "My-Hero-Academia",
-        "season": "10",
-        "episode": "120",
-        "genre": "Action, Thriller, Adventure",
-        "rating": "9.8",
-        "description": "My Hero Academia is a Japanese media franchise that consists of a manga series, an original video game, and live-action TV series. The manga series is set in a world where humanoids called demons exist, and the only way to stop them is by slaying them.",
-        "watchUrl": "https://www.crunchyroll.com/my-hero-academia"
-    },
-    {
-        "imgUrl": "OnePunchMan.jpg",
-        "name": "One Punch Man",
-        "id": "One-Punch-Man",
-        "season": "10",
-        "episode": "120",
-        "genre": "Action, Thriller, Adventure",
-        "rating": "9.8",
-        "description": "One Punch is a Japanese media franchise that consists of a manga series, an original video game, and live-action TV series. The manga series is set in a world where humanoids called demons exist, and the only way to stop them is by slaying them.",
-        "watchUrl": "https://www.crunchyroll.com/one-punch"
-    }
+  {
+    "imgUrl": "DemonSlayer.jpg",
+    "name": "Demon Slayer",
+    "id": "Demon-Slayer",
+    "season": "4",
+    "episode": "55",
+    "genre": "Action, Dark Fantasy, Adventure",
+    "rating": "8.7",
+    "description": "Tanjiro Kamado joins the Demon Slayer Corps to avenge his family and cure his sister, who has turned into a demon.",
+    "watchUrl": "https://www.crunchyroll.com/demon-slayer"
+  },
+  {
+    "imgUrl": "OnePiece.jpg",
+    "name": "One Piece",
+    "id": "One-Piece",
+    "season": "21",
+    "episode": "1100+",
+    "genre": "Adventure, Action, Fantasy",
+    "rating": "9.1",
+    "description": "Monkey D. Luffy sets sail with his crew in search of the legendary treasure, the One Piece, to become the Pirate King.",
+    "watchUrl": "https://www.crunchyroll.com/one-piece"
+  },
+  {
+    "imgUrl": "AttackonTitan.jpg",
+    "name": "Attack on Titan",
+    "id": "Attack-on-Titan",
+    "season": "4",
+    "episode": "89",
+    "genre": "Action, Drama, Dark Fantasy",
+    "rating": "9.0",
+    "description": "Eren Yeager and his friends join the Scout Regiment to fight against giant humanoid Titans threatening humanity.",
+    "watchUrl": "https://www.crunchyroll.com/attack-on-titan"
+  },
+  {
+    "imgUrl": "MyHeroAcademia.jpg",
+    "name": "My Hero Academia",
+    "id": "My-Hero-Academia",
+    "season": "7",
+    "episode": "150+",
+    "genre": "Action, Superhero, School",
+    "rating": "8.0",
+    "description": "In a world of quirks, Izuku Midoriya strives to become the number one hero despite being born powerless.",
+    "watchUrl": "https://www.crunchyroll.com/my-hero-academia"
+  },
+  {
+    "imgUrl": "OnePunchMan.jpg",
+    "name": "One Punch Man",
+    "id": "One-Punch-Man",
+    "season": "2",
+    "episode": "24",
+    "genre": "Action, Comedy, Superhero",
+    "rating": "8.6",
+    "description": "Saitama can defeat any opponent with a single punch, but his unmatched power leaves him bored and seeking challenge.",
+    "watchUrl": "https://www.crunchyroll.com/one-punch"
+  },
+  {
+    "imgUrl": "Berserk.jpg",
+    "name": "Berserk",
+    "id": "Berserk",
+    "season": "3",
+    "episode": "25",
+    "genre": "Dark Fantasy, Horror, Action",
+    "rating": "8.5",
+    "description": "Guts, a lone mercenary, battles through a nightmarish medieval world seeking revenge against his former friend Griffith.",
+    "watchUrl": "https://www.crunchyroll.com/berserk"
+  },
+  {
+    "imgUrl": "JujutsuKaisen.jpg",
+    "name": "Jujutsu Kaisen",
+    "id": "Jujutsu-Kaisen",
+    "season": "2",
+    "episode": "47",
+    "genre": "Action, Supernatural, Dark Fantasy",
+    "rating": "8.6",
+    "description": "Yuji Itadori becomes a Jujutsu sorcerer to battle curses after consuming a powerful cursed object.",
+    "watchUrl": "https://www.crunchyroll.com/jujutsu-kaisen"
+  },
+  {
+    "imgUrl": "TokyoGhoul.jpg",
+    "name": "Tokyo Ghoul",
+    "id": "Tokyo-Ghoul",
+    "season": "4",
+    "episode": "48",
+    "genre": "Dark Fantasy, Horror, Action",
+    "rating": "7.9",
+    "description": "Ken Kaneki becomes half-ghoul and must navigate a brutal world between humans and flesh-eating ghouls.",
+    "watchUrl": "https://www.crunchyroll.com/tokyo-ghoul"
+  },
+  {
+    "imgUrl": "VinlandSaga.jpg",
+    "name": "Vinland Saga",
+    "id": "Vinland-Saga",
+    "season": "2",
+    "episode": "48",
+    "genre": "Historical, Drama, Action",
+    "rating": "8.8",
+    "description": "Thorfinn seeks revenge and redemption during the Viking era in this powerful story of war and growth.",
+    "watchUrl": "https://www.crunchyroll.com/vinland-saga"
+  },
+  {
+    "imgUrl": "ChainsawMan.jpg",
+    "name": "Chainsaw Man",
+    "id": "Chainsaw-Man",
+    "season": "1",
+    "episode": "12",
+    "genre": "Dark Fantasy, Horror, Action",
+    "rating": "8.4",
+    "description": "Denji becomes Chainsaw Man, a devil hunter with the power to tear through evil with chainsaw limbs.",
+    "watchUrl": "https://www.crunchyroll.com/chainsaw-man"
+  },
+  {
+    "imgUrl": "DeathNote.jpg",
+    "name": "Death Note",
+    "id": "Death-Note",
+    "season": "1",
+    "episode": "37",
+    "genre": "Mystery, Thriller, Supernatural",
+    "rating": "9.0",
+    "description": "Light Yagami gains a notebook that allows him to kill anyone and becomes a vigilante known as Kira.",
+    "watchUrl": "https://www.crunchyroll.com/death-note"
+  },
+  {
+    "imgUrl": "Parasyte.jpg",
+    "name": "Parasyte: The Maxim",
+    "id": "Parasyte",
+    "season": "1",
+    "episode": "24",
+    "genre": "Horror, Sci-Fi, Psychological",
+    "rating": "8.4",
+    "description": "Shinichi Izumi fights for control of his body against a parasite trying to take over his brain.",
+    "watchUrl": "https://www.crunchyroll.com/parasyte"
+  },
+  {
+    "imgUrl": "Erased.jpg",
+    "name": "Erased",
+    "id": "Erased",
+    "season": "1",
+    "episode": "12",
+    "genre": "Mystery, Psychological, Supernatural",
+    "rating": "8.5",
+    "description": "A man with time-travel powers must prevent a childhood classmate’s abduction and murder.",
+    "watchUrl": "https://www.crunchyroll.com/erased"
+  },
+  {
+    "imgUrl": "CodeGeass.jpg",
+    "name": "Code Geass",
+    "id": "Code-Geass",
+    "season": "2",
+    "episode": "50",
+    "genre": "Mecha, Psychological, Drama",
+    "rating": "8.9",
+    "description": "Lelouch gains a mysterious power and starts a rebellion against a tyrannical empire using strategic warfare.",
+    "watchUrl": "https://www.crunchyroll.com/code-geass"
+  },
+  {
+    "imgUrl": "MobPhycho.jpg",
+    "name": "Mob Psycho 100",
+    "id": "Mob-Psycho-100",
+    "season": "3",
+    "episode": "37",
+    "genre": "Action, Comedy, Supernatural",
+    "rating": "8.6",
+    "description": "Mob is a psychic teenager trying to live a normal life while dealing with dangerous spirits and emotional turmoil.",
+    "watchUrl": "https://www.crunchyroll.com/mob-psycho-100"
+  }
 ]

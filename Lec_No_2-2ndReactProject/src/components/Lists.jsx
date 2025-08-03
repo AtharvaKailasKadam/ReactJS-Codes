@@ -10,7 +10,9 @@ export const SeriesCard = (props) => {
                 <div>
                     <h3> Seasons : {season} </h3>
                     <h3> Episodes : {episode} </h3>
-                    <h3> Ratings : {rating}/10 </h3>
+                    <h3> Ratings : <span className= {rating >=8.5 ? "superhit" : "average"}> {rating} / 10 </span>
+
+                    </h3>
                     <p> Genre : {genre} </p>
                     <p style = {{fontSize : "15px"}}> Description : {description}</p>
                     <a href = {watchUrl} target = "_blank"> <button>Watch Now</button> </a>
@@ -19,4 +21,3 @@ export const SeriesCard = (props) => {
         </li>
     );
 };
-

@@ -1,4 +1,7 @@
-/* 🌌 Container */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .container {
   max-width: 1200px;
   margin: 2rem auto;
@@ -6,12 +9,11 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
-  background-color: #0a0a23; /* dark violet-blue */
+  background-color: #0a0a23;
   border-radius: 16px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
 }
 
-/* 🔘 Grid Styling */
 .series-card {
   list-style: none;
   padding: 0;
@@ -19,7 +21,6 @@
   display: contents;
 }
 
-/* 🃏 Anime Card */
 .anime-card {
   background: linear-gradient(145deg, #16162e, #1c1c40);
   border-radius: 16px;

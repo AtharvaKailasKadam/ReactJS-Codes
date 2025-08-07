@@ -1,4 +1,4 @@
-import './EventHandling.module.css'
+import styles from "./EventHandling.module.css";
 
 export const EventHandling = () =>
 {
@@ -9,7 +9,7 @@ export const EventHandling = () =>
     }
     return(
         <>
-            <button className = "ClickButton" onClick={handleButtonClick}> Click me </button>
+            <button className={styles.ClickButton} onClick={handleButtonClick}> Click Me,..! </button>
         </>
     )
 }

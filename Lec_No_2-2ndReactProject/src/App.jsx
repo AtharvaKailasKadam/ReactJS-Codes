@@ -4,6 +4,7 @@
 import { NetflixSeries } from "./components/NetflixSeries";
 import { EventHandling } from "./components/EventHandling";
 import "./components/Netflix.module.css";
+import "./components/EventHandling.module.css";
 
 export let App = () => {
   return (

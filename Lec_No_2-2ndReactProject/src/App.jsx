@@ -2,6 +2,7 @@
 
 // This import Name as 'NetflixSeries' can be anything.
 import { NetflixSeries } from "./components/NetflixSeries";
+import "./components/Netflix.module.css";
 
 export let App = () => {
   return (

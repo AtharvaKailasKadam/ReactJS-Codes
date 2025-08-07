@@ -1,0 +1,120 @@
+/* 🌌 Container */
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  background-color: #0a0a23; /* dark violet-blue */
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
+}
+
+/* 🔘 Grid Styling */
+.seriescard {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: contents;
+}
+
+/* 🃏 Anime Card */
+.animecard {
+  background: linear-gradient(145deg, #16162e, #1c1c40);
+  border-radius: 16px;
+  color: #f0f0f0;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+  padding: 1.2rem;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.animecard:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 30px rgba(148, 0, 211, 0.5); /* neon purple */
+  border-color: #9400d3;
+  z-index: 10;
+}
+
+/* 🖼 Image */
+.animecard img {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  transition: transform 0.4s ease;
+}
+
+.animecard:hover img {
+  transform: scale(1.08);
+}
+
+/* 📝 Text Styling */
+.animecard h1 {
+  font-size: 1.4rem;
+  color: #ff8fe6; /* soft pink */
+  margin-bottom: 0.4rem;
+}
+
+.animecard h3 {
+  margin: 0.2rem 0;
+  color: #89f7fe; /* pastel cyan */
+  font-weight: 600;
+}
+
+.animecard p {
+  font-size: 0.9rem;
+  color: #cfcfcf;
+  margin: 0.2rem 0;
+}
+
+/* 🔘 Button */
+.animecard button {
+  display: block;
+  margin: 1rem auto 0;
+  background: linear-gradient(to right, #ff4ecb, #7a6cf7);
+  border: none;
+  color: white;
+  padding: 0.6rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 12px rgba(255, 78, 203, 0.4);
+}
+
+.animecard button:hover {
+  background: linear-gradient(to right, #e100ff, #7f00ff);
+  transform: scale(1.07);
+  box-shadow: 0 8px 16px rgba(127, 0, 255, 0.5);
+}
+
+/* 🎯 Rating Tags */
+.superhit {
+  background-color: #00e676; /* neon green */
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.75rem;
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: #000;
+}
+
+.average {
+  background-color: #ffd600; /* gold yellow */
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.75rem;
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: #000;
+}

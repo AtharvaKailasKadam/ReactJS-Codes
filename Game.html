@@ -1,0 +1,2015 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cyber Heist — The Digital Break-In (Complex)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+  :root{
+    --bg:#0a0a0a;
+    --panel:#1a1a1a;
+    --accent:#00ff00;
+    --muted:#888888;
+    --ok:#00ff00;
+    --bad:#ff4444;
+    --glow:0 0 5px var(--accent), 0 0 10px var(--accent), 0 0 15px var(--accent);
+  }
+  @keyframes scanline {
+    0% { background-position: 0 100%; }
+    100% { background-position: 0 0; }
+  }
+  @keyframes text-flicker {
+    0%, 100% { opacity: 1; text-shadow: var(--glow); }
+    50% { opacity: 0.8; text-shadow: none; }
+  }
+  @keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+  }
+  @keyframes panel-enter {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  html,body{height:100%;margin:0;background:var(--bg);font-family:'Roboto Mono',monospace;color:var(--accent);overflow:hidden;}
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px);
+    background-size: 100% 3px;
+    animation: scanline 10s linear infinite;
+    pointer-events: none; z-index: -1;
+  }
+  .wrap{max-width:1100px;margin:28px auto;padding:18px;background:rgba(0,0,0,0.5);border-radius:4px;box-shadow:inset 0 0 15px rgba(0,255,0,0.2), 0 0 20px rgba(0,0,0,0.8);border:1px solid rgba(0,255,0,0.2); position: relative; z-index: 1;}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;border-bottom:1px solid rgba(0,255,0,0.1);padding-bottom:10px;}
+  h1{margin:0;font-size:24px; animation: text-flicker 3s infinite, glitch 0.5s infinite; text-transform: uppercase;}
+  .meta{color:var(--muted);font-size:12px;}
+  .row{display:flex;gap:12px;align-items:center}
+  .panel{background:var(--panel);padding:16px;border-radius:4px;border:1px solid rgba(0,255,0,0.1);box-shadow: inset 0 0 8px rgba(0,0,0,0.5); animation: panel-enter 0.5s ease-out;}
+  button{background:transparent;border:1px solid var(--accent);color:var(--accent);padding:10px 15px;border-radius:4px;cursor:pointer;font-family:inherit;text-transform:uppercase;transition:all 0.2s;}
+  button:hover{background:var(--accent);color:var(--bg);box-shadow:var(--glow);}
+  button:active { transform: scale(0.95); box-shadow: 0 0 2px var(--accent); }
+  button.primary{background:var(--accent);color:var(--bg);}
+  button.primary:hover{background:transparent;color:var(--accent);}
+  .terminal{font-family:'Roboto Mono',monospace;background:#000;padding:12px;border-radius:4px;color:var(--accent);border:1px solid rgba(0,255,0,0.15); white-space: pre-wrap;}
+  .small{font-size:13px;color:var(--muted)}
+  .q{font-size:16px;margin-bottom:10px; line-height: 1.5;}
+  input[type=text]{padding:10px;border-radius:4px;border:1px solid rgba(0,255,0,0.2);background:rgba(0,0,0,0.5);color:var(--accent);font-family:inherit;width:calc(100% - 22px);}
+  input[type=text]:focus{outline:none; border-color:var(--accent); box-shadow: var(--glow);}
+  .options{display:flex;flex-direction:column;gap:8px}
+  .options button { width: 100%; text-align: left; }
+  .feedback{height:22px;margin-top:8px;font-weight:700;font-size:14px;}
+  .green{color:var(--ok); text-shadow: var(--glow);}
+  .red{color:var(--bad); text-shadow: 0 0 5px var(--bad);}
+  canvas.maze{background:#000;border-radius:4px;border:1px solid rgba(0,255,0,0.2)}
+  .lb-item{display:flex;justify-content:space-between;padding:8px;border-radius:4px;background:rgba(0,255,0,0.05);margin-bottom:6px;border:1px solid rgba(0,255,0,0.1);}
+  footer{display:flex;justify-content:space-between;margin-top:12px;color:var(--muted);font-size:12px;border-top:1px solid rgba(0,255,0,0.1);padding-top:10px;}
+  @media (max-width:900px){ .row{flex-direction:column;align-items:stretch} }
+  #matrix-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+  }
+
+  
+</style>
+</head>
+<body>
+<canvas id="matrix-canvas"></canvas>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Cyber Heist — The Digital Break-In</h1>
+      <div class="meta">Complex Edition — 4 rounds × 5 questions • Hacker vibe • Final passphrase: <strong>SAFE</strong></div>
+    </div>
+    <div class="row controls">
+      <div class="small">Global Timer: <span id="globalTimer">20:00</span></div>
+      <button id="viewLB">Leaderboard</button>
+      <button id="resetLB">Clear LB</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- LOBBY -->
+    <section id="lobby" class="panel">
+      <div class="row" style="justify-content:space-between;align-items:flex-start">
+        <div style="flex:1">
+          <p class="small">You are a ShadowNet operative. In 20 minutes the AI sentinel will detect intruders. Complete four rounds (each round contains 5 puzzles). Each round yields a clue (one letter) — together they form the vault passphrase.</p>
+          <ol class="small" style="margin-left:18px">
+            <li>Round 1 — Logic Locks (5 puzzles) → captures <strong>S</strong></li>
+            <li>Round 2 — Code Scramble (5 puzzles) → captures <strong>A</strong></li>
+            <li>Round 3 — Firewall Maze (5 mini-puzzles & movement) → captures <strong>F</strong></li>
+            <li>Round 4 — Vault Password (5 final checks) → captures <strong>E</strong></li>
+          </ol>
+        </div>
+        <div style="width:320px">
+          <label class="small">Team / Player name</label><br>
+          <input id="playerName" type="text" placeholder="Team Alpha" style="width:100%;margin-bottom:8px"/>
+          <div class="row">
+            <button id="startBtn" class="primary">Begin Mission</button>
+            <button id="howTo">How to Play</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GAME STAGE -->
+    <section id="stage" class="panel" style="display:none;margin-top:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div class="small">Player: <strong id="playerLabel"></strong></div>
+          <div class="small">Round <span id="roundNum">1</span> / 4 • Q <span id="qNum">1</span> / 5</div>
+        </div>
+        <div style="text-align:right">
+          <div class="small">Round Timer: <span id="roundTimer">--</span></div>
+          <div class="small">Score: <span id="score">0</span></div>
+        </div>
+      </div>
+
+      <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+
+      <div id="roundArea"></div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <button id="submitBtn" class="primary">Submit</button>
+        <button id="skipBtn">Skip Q (-time)</button>
+        <div class="feedback" id="feedback"></div>
+      </div>
+    </section>
+
+    <!-- END -->
+    <section id="end" class="panel" style="display:none;margin-top:12px">
+      <h2>Mission Summary</h2>
+      <p id="endSummary"></p>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="saveHandle" placeholder="Handle to save" />
+        <button id="saveScoreBtn" class="primary">Save Score</button>
+        <button id="restartBtn">Play Again</button>
+      </div>
+    </section>
+
+    <!-- LEADERBOARD -->
+    <section id="lbPanel" class="panel" style="display:none;margin-top:12px">
+      <h3>Leaderboard</h3>
+      <div id="lbList" style="max-height:220px;overflow:auto;margin-top:8px"></div>
+      <div style="margin-top:8px">
+        <button id="lbBack">Back</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="small">Tip: Use arrow keys for the maze. Correct answers will move you forward in Round 3.</div>
+    <div class="small">Built for your tech fest • Editable questions in JS</div>
+  </footer>
+</div>
+
+<script>
+/* ========= Configuration & Puzzles ========= */
+/* Global time: 20 minutes (1200s) */
+let GLOBAL_TIME = 20 * 60;
+
+/* Each round: 5 questions */
+const ROUND_COUNT = 4;
+const Q_PER_ROUND = 5;
+
+/* Round-specific time limits (per question or per round) */
+const ROUND_TIME = [180, 180, 240, 240]; // seconds per round
+
+/* We'll collect clue letters: S, A, F, E by default if player completes rounds; but we make them conditional on performance */
+let gameState = {
+  player: '',
+  roundIndex: 0,   // 0..3
+  qIndex: 0,       // 0..4
+  score: 0,
+  collectedClues: [], // push letters when round finished successfully
+  globalTimeLeft: GLOBAL_TIME,
+  roundTimeLeft: 0,
+  running: false,
+};
+
+/* QUESTIONS: arrays for each round (5 items each).
+   Each question item: { type:'mcq'|'text'|'code'|'cipher', prompt:'', options:[], answer:'', points: number }
+   Keep answers case-insensitive. Adjust as needed.
+*/
+const ROUNDS = [
+  /* ROUND 1: Logic Locks (S) */
+  [
+    { type:'mcq', prompt:'Sequence: 2, 4, 8, 16, ? — what comes next?', options:['18','24','32','34'], answer:'32', points:10 },
+    { type:'text', prompt:'Binary -> ASCII: 01001000 01001001 (two letters). What is it?', answer:'HI', points:12 },
+    { type:'mcq', prompt:'I follow you all day long but vanish at night. What am I?', options:['Echo','Shadow','Reflection','Wind'], answer:'Shadow', points:12 },
+    { type:'text', prompt:'What 3-letter English word becomes shorter when you add two letters to it?', answer:'Short', points:10 },
+    { type:'mcq', prompt:'Odd one out: IP, URL, CSS, DNS', options:['IP','URL','CSS','DNS'], answer:'CSS', points:10 }
+  ],
+  /* ROUND 2: Code Scramble (A) */
+  [
+    { type:'fix', prompt:'What does this pseudo-code print?\\nfor i in range(3):\\n  print(i)', answer:'0,1,2', points:10 },
+    { type:'scramble', prompt:'Unscramble this: ENRTWOK', answer:'NETWORK', points:12 },
+    { type:'mcq', prompt:'Which keyword declares a constant in JS?', options:['var','let','const','def'], answer:'const', points:10 },
+    { type:'cipher', prompt:'Caesar shift 3: KHOOR -> ?', answer:'HELLO', points:14 },
+    { type:'text', prompt:'Common data structure using FIFO?', answer:'QUEUE', points:10 }
+  ],
+  /* ROUND 3: Firewall Maze (F) - mini puzzles that affect movement */
+  [
+    { type:'text', prompt:'Which port is commonly used for HTTP?', answer:'80', points:6 },
+    { type:'mcq', prompt:'Which is NOT a programming language?', options:['HTML','Python','Java','C'], answer:'HTML', points:6 },
+    { type:'text', prompt:'Reverse this word: KCOL', answer:'LOCK', points:6 },
+    { type:'text', prompt:'If 2+3=10 in base x, what is x?', answer:'4', points:8 },
+    { type:'text', prompt:'Common 3-letter protocol for secure web', answer:'TLS', points:8 }
+  ],
+  /* ROUND 4: Vault Password (E) - final checks; last Q requires passphrase containing SAFE */
+  [
+    { type:'text', prompt:'Combine earlier first letters to form a word. (Hint: target word is 4 letters)', answer:'SAFE', points:10 },
+    { type:'cipher', prompt:'Base64 decode: U0FGRQ== -> ?', answer:'SAFE', points:12 },
+    { type:'scramble', prompt:'Reorder this: E F A S -> ?', answer:'SAFE', points:10 },
+    { type:'text', prompt:'Simple check: type the 4-letter target word that completes the sequence SAFE', answer:'SAFE', points:8 },
+    { type:'final', prompt:'Enter your final vault passphrase (must include SAFE)', answerContains:'SAFE', points:40 }
+  ]
+];
+
+/* ========= UI references ========= */
+const startBtn = document.getElementById('startBtn');
+const howToBtn = document.getElementById('howTo');
+const lobby = document.getElementById('lobby');
+const stage = document.getElementById('stage');
+const end = document.getElementById('end');
+const roundArea = document.getElementById('roundArea');
+const playerNameInput = document.getElementById('playerName');
+const roundNumEl = document.getElementById('roundNum');
+const qNumEl = document.getElementById('qNum');
+const scoreEl = document.getElementById('score');
+const submitBtn = document.getElementById('submitBtn');
+const skipBtn = document.getElementById('skipBtn');
+const feedbackEl = document.getElementById('feedback');
+const roundTimerEl = document.getElementById('roundTimer');
+const globalTimerEl = document.getElementById('globalTimer');
+const playerLabel = document.getElementById('playerLabel');
+
+const lbBtn = document.getElementById('viewLB');
+const lbPanel = document.getElementById('lbPanel');
+const lbBack = document.getElementById('lbBack');
+const lbList = document.getElementById('lbList');
+const resetLB = document.getElementById('resetLB');
+
+const endSummary = document.getElementById('endSummary');
+const saveHandle = document.getElementById('saveHandle');
+const saveScoreBtn = document.getElementById('saveScoreBtn');
+const restartBtn = document.getElementById('restartBtn');
+
+/* ========= Leaderboard helpers ========= */
+function loadLB(){
+  try { return JSON.parse(localStorage.getItem('cyber_heist_lb')||'[]'); } catch(e){ return [];}
+}
+function saveLB(arr){ localStorage.setItem('cyber_heist_lb', JSON.stringify(arr)); }
+function renderLB(){
+  const arr = loadLB().sort((a,b)=>b.score - a.score);
+  lbList.innerHTML = '';
+  if(arr.length===0){ lbList.innerHTML = '<div class="small">No scores yet</div>'; return; }
+  arr.forEach(it=>{
+    const div = document.createElement('div'); div.className='lb-item';
+    div.innerHTML = `<div>${escapeHtml(it.name)}</div><div>${it.score}</div>`;
+    lbList.appendChild(div);
+  });
+}
+
+/* ========= Utilities ========= */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  lbPanel.style.display = 'none';
+  stage.style.display = '';
+  gameState.running = true;
+  gameState.roundIndex = 0; gameState.qIndex = 0; gameState.score = 0; gameState.collectedClues = [];
+  scoreEl.innerText = gameState.score;
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Typing effect utility */
+function typeEffect(element, text, speed = 30) {
+  element.innerText = '';
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.append(text.charAt(i));
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+/* ========= Timers ========= */
+let globalTimer = null;
+function startGlobalTimer(){
+  clearInterval(globalTimer);
+  globalTimer = setInterval(()=>{
+    gameState.globalTimeLeft--;
+    if(gameState.globalTimeLeft <= 0){ gameState.globalTimeLeft = 0; endGame('TIME'); return; }
+    const mm = Math.floor(gameState.globalTimeLeft / 60);
+    const ss = gameState.globalTimeLeft % 60;
+    globalTimerEl.innerText = `${pad(mm)}:${pad(ss)}`;
+  },1000);
+}
+
+/* Round timer */
+let roundTimer = null;
+function startRoundTimer(sec){
+  clearInterval(roundTimer);
+  gameState.roundTimeLeft = sec;
+  roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  roundTimer = setInterval(()=>{
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft<=0){
+      clearInterval(roundTimer);
+      feedback('Round time expired — moving on', false);
+      // treat as fail for round — move on after short delay
+      setTimeout(()=>advanceRound(false), 1000);
+      return;
+    }
+    roundTimerEl.innerText = `${gameState.roundTimeLeft}s`;
+  },1000);
+}
+function stopRoundTimer(){ clearInterval(roundTimer); roundTimerEl.innerText = '--'; }
+
+/* ========= Start / Flow control ========= */
+startBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Player';
+  gameState.player = name;
+  playerLabel.innerText = name;
+  lobby.style.display = 'none';
+  // global time
+  gameState.globalTimeLeft = GLOBAL_TIME;
+  startGlobalTimer();
+  startRound(0);
+});
+howToBtn.addEventListener('click', ()=>{
+  alert('How to play:\\n\\n• 4 rounds, each 5 puzzles. Answer each puzzle and click Submit.\\n• Round 3 is a maze: correct mini-answers move you closer to the exit; use arrow keys to fine-tune movement.\\n• Final round: the last question requires a passphrase containing SAFE.\\n• You have overall 20 minutes. Good luck, operative.');
+});
+
+lbBtn.addEventListener('click', ()=>{ lobby.style.display='none'; stage.style.display='none'; lbPanel.style.display=''; renderLB(); });
+lbBack.addEventListener('click', ()=>{ lbPanel.style.display='none'; lobby.style.display=''; });
+
+resetLB.addEventListener('click', ()=>{ if(confirm('Clear leaderboard?')){ saveLB([]); renderLB(); alert('Leaderboard cleared') } });
+
+/* ========= Render question UI for current round/q ========= */
+function startRound(roundIdx){
+  gameState.roundIndex = roundIdx;
+  gameState.qIndex = 0;
+  roundNumEl.innerText = roundIdx+1;
+  renderCurrentQuestion();
+  startRoundTimer(ROUND_TIME[roundIdx]);
+}
+
+function renderCurrentQuestion(){
+  const r = gameState.roundIndex;
+  const q = gameState.qIndex;
+  roundNumEl.innerText = r+1;
+  qNumEl.innerText = q+1;
+  feedbackEl.innerText = '';
+  const item = ROUNDS[r][q];
+  roundArea.innerHTML = ''; // clear
+
+  // For round 3 we show maze + mini question to answer (movement)
+  if(r === 2){
+    // Maze layout plus mini-question UI
+    const container = document.createElement('div');
+    container.innerHTML = `
+      <div style="display:flex;gap:12px">
+        <canvas id="mazeCanvas" class="maze" width="360" height="360"></canvas>
+        <div style="flex:1">
+          <div class="terminal small">FIREWALL NODE — Mini puzzle ${q+1} / ${Q_PER_ROUND}</div>
+          <div style="margin-top:8px" id="miniPrompt"></div>
+          <div style="margin-top:10px" class="row">
+            <input id="miniInput" type="text" style="flex:1" placeholder="Answer here" />
+            <button id="miniSubmit" class="primary">Send</button>
+          </div>
+          <div class="small" style="margin-top:8px">Tip: Correct answer moves you one step toward the exit. Arrow keys move you manually too.</div>
+        </div>
+      </div>
+    `;
+    roundArea.appendChild(container);
+    document.getElementById('miniPrompt').innerText = item.prompt;
+    // set up maze
+    initMazeCanvas();
+    // wire button
+    document.getElementById('miniSubmit').onclick = () => {
+      const ans = document.getElementById('miniInput').value.trim();
+      handleAnswer(ans);
+      document.getElementById('miniInput').value = '';
+    };
+    return;
+  }
+
+  // For other rounds render based on type
+  const title = document.createElement('div'); title.className='q'; title.innerText = item.prompt;
+  roundArea.appendChild(title);
+
+  if(item.type === 'mcq'){
+    const opts = document.createElement('div'); opts.className='options';
+    item.options.forEach(opt=>{
+      const b = document.createElement('button'); b.className=''; b.innerText = opt;
+      b.onclick = ()=> handleAnswer(opt);
+      opts.appendChild(b);
+    });
+    roundArea.appendChild(opts);
+  } else if(item.type === 'fix' || item.type === 'scramble' || item.type === 'cipher' || item.type === 'text' || item.type === 'final'){
+    const input = document.createElement('input'); input.type='text'; input.id='qInput'; input.placeholder='Type your answer here';
+    roundArea.appendChild(input);
+    // If the question has code block (contains \\n), show pre
+    if(item.prompt && item.prompt.includes('\\n')) {
+      const pre = document.createElement('pre'); pre.className='terminal'; pre.style.marginTop='8px'; pre.innerText = item.prompt;
+      roundArea.insertBefore(pre, input);
+    }
+    // focus
+    setTimeout(()=> input.focus(), 40);
+  } else {
+    // default
+    const input = document.createElement('input'); input.type='text'; input.id='qInput';
+    roundArea.appendChild(input);
+  }
+}
+
+/* ========= Submit handling ========= */
+submitBtn.addEventListener('click', ()=>{
+  // For maze mini question, submit handled by miniSubmit
+  if(gameState.roundIndex === 2) { feedback('Use the mini puzzle panel to submit', false); return; }
+  const item = ROUNDS[gameState.roundIndex][gameState.qIndex];
+  const ans = (document.getElementById('qInput') || {}).value || '';
+  handleAnswer(ans);
+});
+
+/* Skip a question (penalize global time 15s) */
+skipBtn.addEventListener('click', ()=>{
+  if(!confirm('Skip this question? This costs 15 seconds from the global timer.')) return;
+  gameState.globalTimeLeft = Math.max(0, gameState.globalTimeLeft - 15);
+  feedback('Skipped (-15s)', false);
+  // advance as wrong
+  setTimeout(()=> advanceQ(false), 600);
+});
+
+/* Core answer evaluator */
+function handleAnswer(rawAns){
+  const r = gameState.roundIndex, q = gameState.qIndex;
+  const item = ROUNDS[r][q];
+  const ans = String(rawAns).trim();
+  if(item.type === 'mcq' || item.type === 'text' || item.type === 'fix' || item.type === 'scramble' || item.type === 'cipher'){
+    const ok = checkMatch(ans, item.answer);
+    if(ok){
+      gameState.score += item.points;
+      scoreEl.innerText = gameState.score;
+      feedback('ACCESS GRANTED +'+item.points, true);
+      // special for round 3 (maze movement): move closer (we implement in maze)
+      if(r === 2) { // handled inside mini submit; but double-safety:
+        movePlayerTowardsExit();
+      }
+      setTimeout(()=> advanceQ(true), 800);
+    } else {
+      // wrong
+      gameState.score = Math.max(0, gameState.score - Math.min(5, Math.floor(item.points/3)));
+      scoreEl.innerText = gameState.score;
+      feedback('ACCESS DENIED', false);
+      // small global time penalty
+      gameState.globalTimeLeft = Math.max(0, gameState.globalTimeLeft - 8);
+      setTimeout(()=> advanceQ(false), 900);
+    }
+  } else if(item.type === 'final'){
+    // answerContains check
+    const required = item.answerContains || '';
+    if(ans.toUpperCase().includes(required.toUpperCase())){
+      gameState.score += item.points;
+      scoreEl.innerText = gameState.score;
+      feedback('VAULT OPENED +'+item.points, true);
+      setTimeout(()=> advanceRound(true), 1400);
+    } else {
+      gameState.score = Math.max(0, gameState.score - 15);
+      scoreEl.innerText = gameState.score;
+      feedback('FINAL KEY WRONG -15', false);
+      gameState.globalTimeLeft = Math.max(0, gameState.globalTimeLeft - 12);
+      setTimeout(()=> advanceQ(false), 1200);
+    }
+  } else {
+    // default fallback
+    feedback('Submitted — processing', true);
+    setTimeout(()=> advanceQ(false), 700);
+  }
+}
+
+function checkMatch(answer, expected){
+  if(expected === undefined || expected === null) return false;
+  return String(answer).trim().toUpperCase() === String(expected).trim().toUpperCase();
+}
+
+/* Advance question within same round */
+function advanceQ(correct){
+  const r = gameState.roundIndex;
+  if(gameState.qIndex < Q_PER_ROUND - 1){
+    gameState.qIndex++;
+    renderCurrentQuestion();
+  } else {
+    // round finished
+    advanceRound(correct);
+  }
+}
+
+/* Advance to next round */
+function advanceRound(successful){
+  // determine clue letter awarded based on round and performance
+  const roundLetter = ['S','A','F','E'][gameState.roundIndex];
+  // simple rule: if player got at least 2 correct answers in the round (approx), award clue
+  // For simplicity we award always if score increased during round; but let's implement a local heuristic:
+  // We'll track round score window by snapshotting before round start
+  if(!gameState._roundStartScore) gameState._roundStartScore = 0;
+  const gained = gameState.score - gameState._roundStartScore;
+  const awarded = gained >= (ROUNDS[gameState.roundIndex].reduce((s,q)=>s+Math.max(6,q.points/2),0)/5); // heuristic
+  if(awarded) gameState.collectedClues.push(roundLetter);
+  // advance
+  stopRoundTimer();
+  gameState.roundIndex++;
+  if(gameState.roundIndex >= ROUND_COUNT){
+    // finish game
+    endGame('COMPLETE');
+    return;
+  }
+  // snapshot start score for next round
+  gameState._roundStartScore = gameState.score;
+  // reset qIndex and render next round after short delay
+  gameState.qIndex = 0;
+  setTimeout(()=> startRound(gameState.roundIndex), 700);
+}
+
+/* end game */
+function endGame(reason){
+  // stop timers
+  clearInterval(globalTimer);
+  stopRoundTimer();
+  stage.style.display = 'none';
+  end.style.display = '';
+  gameState.running = false;
+  let msg = '';
+  if(reason === 'TIME') msg = 'Security sentinel detected you — time expired.';
+  else if(reason === 'COMPLETE') msg = 'You completed all rounds.';
+  else msg = 'Mission ended.';
+  // show summary
+  endSummary.innerHTML = `<strong>${msg}</strong><br>Player: ${escapeHtml(gameState.player)}<br>Score: ${gameState.score}<br>Clues captured: ${gameState.collectedClues.join(', ') || 'None'}<br>Passphrase expected: SAFE (collect these letters across rounds to strongly ensure vault open).`;
+}
+
+/* Save score */
+saveScoreBtn.addEventListener('click', ()=>{
+  const handle = saveHandle.value.trim() || gameState.player || 'Anon';
+  const list = loadLB();
+  list.push({ name:handle, score:gameState.score, date:Date.now()});
+  saveLB(list);
+  alert('Saved!');
+});
+
+/* Restart */
+restartBtn.addEventListener('click', ()=> location.reload());
+
+/* ========== Maze Implementation (Round 3) ========== */
+/* We'll implement a 5x5 grid; player has pos; finish at (4,4).
+   Correct mini-puzzle answer moves player one step toward exit.
+   Arrow keys also move if cell free.
+*/
+const MAZE_GRID = [
+  [0,0,1,0,0],
+  [0,1,1,0,1],
+  [0,0,0,0,0],
+  [1,0,1,1,0],
+  [0,0,0,0,0]
+];
+let mazeState = { x:0, y:0, reached:false };
+
+function initMazeCanvas(){
+  mazeState = { x:0, y:0, reached:false };
+  const canvas = document.getElementById('mazeCanvas');
+  const ctx = canvas.getContext('2d');
+  const size = 5;
+  const cell = canvas.width / size;
+
+  function draw(){
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+    for(let y=0;y<size;y++){
+      for(let x=0;x<size;x++){
+        if(MAZE_GRID[y][x] === 1) ctx.fillStyle = '#243849';
+        else ctx.fillStyle = '#041421';
+        ctx.fillRect(x*cell, y*cell, cell-2, cell-2);
+      }
+    }
+    // start
+    ctx.fillStyle = '#ffd59e';
+    ctx.fillRect(0*cell+4,0*cell+4,cell-8,cell-8);
+    // exit
+    ctx.fillStyle = '#6eff9b';
+    ctx.fillRect(4*cell+4,4*cell+4,cell-8,cell-8);
+    // player
+    ctx.fillStyle = '#00f0ff';
+    ctx.beginPath();
+    ctx.arc(mazeState.x*cell + cell/2, mazeState.y*cell + cell/2, cell/6, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  function moveIfFree(nx, ny){
+    if(nx>=0 && ny>=0 && nx<5 && ny<5 && MAZE_GRID[ny][nx] === 0){
+      mazeState.x = nx; mazeState.y = ny;
+      if(mazeState.x === 4 && mazeState.y === 4){
+        mazeState.reached = true;
+        feedback('Reached core! F-clue captured (press Submit to proceed)', true);
+      }
+    } else {
+      // hit wall
+      feedback('Firewall blocked move', false);
+    }
+    draw();
+  }
+
+  // keyboard controls
+  function onKey(e){
+    const k = e.key;
+    if(k === 'ArrowUp') moveIfFree(mazeState.x, mazeState.y-1);
+    if(k === 'ArrowDown') moveIfFree(mazeState.x, mazeState.y+1);
+    if(k === 'ArrowLeft') moveIfFree(mazeState.x-1, mazeState.y);
+    if(k === 'ArrowRight') moveIfFree(mazeState.x+1, mazeState.y);
+  }
+  window.addEventListener('keydown', onKey);
+  // mini-submit moves also call moveIfFree toward exit
+  draw();
+
+  // store a cleanup reference (not strictly necessary in single-file)
+  mazeState._cleanup = ()=> window.removeEventListener('keydown', onKey);
+}
+
+/* Called when mini-puzzle in maze answered correctly */
+function movePlayerTowardsExit(){
+  // attempt to move one step along a simple greedy path towards (4,4)
+  const tryDirs = [{dx:1,dy:0},{dx:0,dy:1},{dx:1,dy:1},{dx:0,dy:-1},{dx:-1,dy:0}];
+  for(const d of tryDirs){
+    const nx = mazeState.x + d.dx, ny = mazeState.y + d.dy;
+    if(nx>=0 && ny>=0 && nx<5 && ny<5 && MAZE_GRID[ny][nx] === 0){
+      mazeState.x = nx; mazeState.y = ny;
+      break;
+    }
+  }
+  // redraw by reinitializing drawing context (simple approach)
+  const canvas = document.getElementById('mazeCanvas');
+  if(canvas){
+    const ctx = canvas.getContext('2d');
+    // quick draw similar to initMazeCanvas draw part
+    const size = 5; const cell = canvas.width/size;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(let y=0;y<size;y++){
+      for(let x=0;x<size;x++){
+        if(MAZE_GRID[y][x] === 1) ctx.fillStyle = '#243849';
+        else ctx.fillStyle = '#041421';
+        ctx.fillRect(x*cell, y*cell, cell-2, cell-2);
+      }
+    }
+    ctx.fillStyle = '#ffd59e'; ctx.fillRect(0*cell+4,0*cell+4,cell-8,cell-8);
+    ctx.fillStyle = '#6eff9b'; ctx.fillRect(4*cell+4,4*cell+4,cell-8,cell-8);
+    ctx.fillStyle = '#00f0ff'; ctx.beginPath(); ctx.arc(mazeState.x*cell + cell/2, mazeState.y*cell + cell/2, cell/6, 0, Math.PI*2); ctx.fill();
+    if(mazeState.x===4 && mazeState.y===4){
+      mazeState.reached = true;
+      feedback('Reached core! F-clue captured (press Submit to proceed)', true);
+    }
+  }
+}
+
+/* When user submits a mini answer (maze), handle it specially */
+function handleMiniSubmission(ans){
+  // Evaluate current mini question for round 3
+  const r = gameState.roundIndex, q = gameState.qIndex;
+  const item = ROUNDS[r][q];
+  const ok = checkMatch(ans, item.answer);
+  if(ok){
+    gameState.score += item.points;
+    scoreEl.innerText = gameState.score;
+    feedback('Node bypassed +'+item.points, true);
+    // move player one step toward exit
+    movePlayerTowardsExit();
+    setTimeout(()=> advanceQ(true), 800);
+  } else {
+    feedback('Probe detected — failed', false);
+    gameState.globalTimeLeft = Math.max(0, gameState.globalTimeLeft - 10);
+    gameState.score = Math.max(0, gameState.score - 4);
+    scoreEl.innerText = gameState.score;
+    setTimeout(()=> advanceQ(false), 900);
+  }
+}
+
+/* Replace default handleAnswer within maze's mini submit */
+function hookMiniSubmitIfPresent(){
+  const btn = document.getElementById('miniSubmit');
+  if(btn){
+    btn.onclick = () => {
+      const ans = document.getElementById('miniInput').value.trim();
+      document.getElementById('miniInput').value = '';
+      handleMiniSubmission(ans);
+    };
+  }
+}
+
+/* Feedback helper */
+function feedback(text, ok){
+  feedbackEl.innerText = text;
+  if(ok){ feedbackEl.classList.add('green'); feedbackEl.classList.remove('red'); }
+  else { feedbackEl.classList.add('red'); feedbackEl.classList.remove('green'); }
+  setTimeout(()=>{ feedbackEl.innerText=''; feedbackEl.classList.remove('green'); feedbackEl.classList.remove('red'); }, 2600);
+}
+
+/* Observe mutations: after rendering new question, hook mini submit if maze content exists */
+const observer = new MutationObserver(()=>{ hookMiniSubmitIfPresent(); initMazeCanvasIfNeeded(); });
+observer.observe(roundArea, { childList: true, subtree: true });
+
+function initMazeCanvasIfNeeded(){
+  if(document.getElementById('mazeCanvas')){
+    initMazeCanvas();
+    hookMiniSubmitIfPresent();
+  }
+}
+
+/* Before first round snapshot */
+gameState._roundStartScore = 0;
+
+/* Auto-render first UI if necessary (none) */
+
+
+
+/* Some safety: when round changes and we are in non-maze rounds, pressing Enter triggers submit */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter' && stage.style.display !== 'none'){
+    if(gameState.roundIndex === 2){
+      // if focus within miniInput, let mini submit handle; else ignore
+      const active = document.activeElement;
+      if(active && active.id === 'miniInput'){
+        document.getElementById('miniSubmit')?.click();
+      } else {
+        submitBtn.click();
+      }
+    } else {
+      submitBtn.click();
+    }
+  }
+});
+
+/* To keep the game moving: when a round starts, mark round start score snapshot */
+const originalStartRound = startRound;
+startRound = function (roundIdx){
+  gameState._roundStartScore = gameState.score;
+  originalStartRound(roundIdx);
+};
+
+</script>
+<script>
+  const matrixCanvas = document.getElementById('matrix-canvas');
+  if (matrixCanvas) {
+    const matrixCtx = matrixCanvas.getContext('2d');
+
+    const setupCanvas = () => {
+      matrixCanvas.width = window.innerWidth;
+      matrixCanvas.height = window.innerHeight;
+    };
+    setupCanvas();
+
+    const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
+    const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const nums = '0123456789';
+    const alphabet = katakana + latin + nums;
+
+    const fontSize = 16;
+    let columns = Math.floor(window.innerWidth / fontSize);
+    const rainDrops = [];
+
+    const initializeRain = () => {
+        columns = Math.floor(window.innerWidth / fontSize);
+        rainDrops.length = 0;
+        for (let x = 0; x < columns; x++) {
+            rainDrops[x] = 1;
+        }
+    };
+    initializeRain();
+
+    const drawMatrix = () => {
+      matrixCtx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+      matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+
+      matrixCtx.fillStyle = 'var(--accent)';
+      matrixCtx.font = fontSize + 'px monospace';
+
+      for (let i = 0; i < rainDrops.length; i++) {
+        const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+        matrixCtx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+
+        if (rainDrops[i] * fontSize > matrixCanvas.height && Math.random() > 0.975) {
+          rainDrops[i] = 0;
+        }
+        rainDrops[i]++;
+      }
+    };
+
+    setInterval(drawMatrix, 45);
+
+    window.addEventListener('resize', () => {
+        setupCanvas();
+        initializeRain();
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,13 +1,10 @@
-// Now Using the React Fragments.
-// This import Name as 'NetflixSeries' can be anything.
-
 import { NetflixSeries } from "./components/NetflixSeries";
 import "./components/Netflix.module.css";
 import "./components/EventHandling.module.css";
 
 export let App = () => {
   return (
-    // Can also use the '<Fragment>  </Fragment>' as a Parent div.
+
     <section className = "container">
       <NetflixSeries />
     </section>

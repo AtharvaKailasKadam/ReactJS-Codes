@@ -1,13 +1,7 @@
 import  styles from "./Netflix.module.css";
 import styled from "styled-components";
 
-
-export const SeriesCard = (props) => {
-    const {id, name, imgUrl, season, episode, rating, genre, description, watchUrl} = props.data;
-
-    const ratingClass = rating >= 8.5 ? styles.superhit : styles.average;
-
-    const Button = styled.button({
+const Button = styled.button({
         backgroundColor : "red",
         color : "white",
         padding : "10px 20px",
@@ -20,6 +14,11 @@ export const SeriesCard = (props) => {
         margin : "10px 0"
 
     })
+
+export const SeriesCard = (props) => {
+    const {id, name, imgUrl, season, episode, rating, genre, description, watchUrl} = props.data;
+
+    const ratingClass = rating >= 8.5 ? styles.superhit : styles.average;
 
     return(
         <li className = {styles.animecard} key = {id}>

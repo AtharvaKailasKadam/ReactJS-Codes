@@ -1,17 +1,30 @@
-.ClickButton
-{
-    padding: 10px 20px;
-    border: 1px solid red;
-    border-radius: 5px;
-    background-color: transparent;
-    color: red;
-    font-size: 16px;
-    cursor: pointer;
+.ClickButton {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background-color: #3498db;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  animation: pulse 2s infinite;
+  margin: 0 auto;
+  display: block;
 }
 
-/* css */
-.ClickButton:hover
-{
-    background-color: red;
-    color: white;
+.ClickButton:hover {
+  background-color: #2ecc71;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transform: scale(1.1);
+  animation: none;
+}
+
+.ClickButton:active {
+  background-color: #1abc9c;
+  transform: translateY(2px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  animation: none;
 }

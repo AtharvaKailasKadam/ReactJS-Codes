@@ -5,8 +5,7 @@ export const EventHandling = () =>
 
     const handleButtonClick = () =>
     {
-        alert("I'm Event Handling Event...!");
-        console.log("Button Clicked");
+        alert("Thank You For Visiting This Page...!");
     }
     return(
         <>

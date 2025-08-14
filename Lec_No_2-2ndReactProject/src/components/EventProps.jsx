@@ -6,19 +6,17 @@ export const EventProps = () =>
     return(
         <>
             <div className={style.EventProps}>
-            <Welcome onclick = {() => alert("Once Again Welcome....!")} />
+                <Welcome />
             </div>
         </>
     )
 }
 
-const Welcome = (props) =>
+const Welcome = () =>
 {
-    const {onclick} = props;
     return(
         <div>
             <h1 className={style.Welcome}> Welcome To The Anime Watch-List</h1>
-            <button className={style.ClickButton} onClick = {onclick}> Click Me </button>
         </div>
     )
 }

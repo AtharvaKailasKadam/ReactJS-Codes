@@ -13,5 +13,3 @@ export const EventHandling = () =>
         </>
     )
 }
-
-import React from 'react';

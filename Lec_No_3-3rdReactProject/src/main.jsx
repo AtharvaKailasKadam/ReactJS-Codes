@@ -4,10 +4,9 @@ import './index.css'
 // import { App } from './App.jsx'
 import { Profile } from './profile'
 import { State } from './hooks/States'
-
+import { DerivedState } from './hooks/DerivedState'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <State />
-    {/* <App /> */}
+    <DerivedState />
   </StrictMode>,
 )

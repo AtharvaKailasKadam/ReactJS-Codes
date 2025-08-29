@@ -9,7 +9,7 @@ body {
 
 .toggleSwitch {
   width: 100px;
-  height: 50px;
+  height: 51px;
   background-color: #ccc;
   border-radius: 25px;
   position: relative;
@@ -17,41 +17,38 @@ body {
   transition: background-color 0.3s;
 }
 
-.toggleSwitch.on {
-  background-color: #4CAF50;
-}
-
 .switch {
+  border: #ccc solid 1px;
   width: 44px;
   height: 44px;
-  background-color: #4CAF50;
+  background-color: red;
   border-radius: 50%;
   position: absolute;
   top: 3px;
   left: 3px;
-  transition: left 0.3s;
+  transition: left 0.3s, background-color 0.3s;
 }
 
-.toggleSwitch.on .switch {
-  left: 53px;
+.ON {
+  transition: transform 0.3s;
+  background-color: #4CAF50;
+  transform: translate(49px);
+}
+
+.OFF {
+  transition: transform 0.3s;
+  background-color: red;
+  transform: translateX(0px);
 }
 
 .state {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-family: sans-serif;
   font-size: 12px;
   font-weight: bold;
   color: white;
-  transition: left 0.3s, right 0.3s;
-}
-
-.toggleSwitch .state {
-    left: 15px;
-}
-
-.toggleSwitch.on .state {
-    right: 15px;
-    left: auto;
+  pointer-events: none;
 }

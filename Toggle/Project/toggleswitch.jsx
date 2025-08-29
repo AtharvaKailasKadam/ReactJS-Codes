@@ -1,16 +1,22 @@
+import { useState } from 'react'
 import styles from './toggleswitch.module.css'
 
 export const ToggleSwitch = () =>
-{
-    const {toggleSwitch, switch: switchClass, state} = styles
-    return(
-        <>
-            <div className = {toggleSwitch}>
+    {
+    const [isOn, setIsOn] = useState(false);
 
-                <div className = {switchClass}>
-                    <span className = {state}>ON</span>
-                </div>
+    const handleToggleSwitch = () =>
+    {
+        setIsOn(!isOn);
+    };
+
+    const { toggleSwitch, switch: Switch, state, ON, OFF } = styles;
+
+    return (
+        <div className={toggleSwitch} style = {{background: isOn ? "green" : "darkred"}} onClick={handleToggleSwitch}>
+            <div className={`${Switch} ${isOn ? ON : OFF}`}>
+                <span className={state}>{isOn ? "ON" : "OFF"}</span>
             </div>
-        </>
-    )
-}
+        </div>
+    );
+};

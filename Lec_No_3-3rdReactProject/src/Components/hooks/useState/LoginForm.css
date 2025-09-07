@@ -21,8 +21,8 @@
 
 .formBody {
   background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   padding: 30px 40px;
   border-radius: 15px;
   border: 1px solid rgba(255, 255, 255, 0.2);

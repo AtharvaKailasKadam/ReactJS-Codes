@@ -1,14 +1,11 @@
-import { LiftingState } from "./Components/LiftingTheStateUp"
-import { ShortCircuitEvaluations } from "./ShortCircuitEvaluation"
-import { Counter } from "./Components/hooks/useState";
-import { ChallengeofuseState } from "./Components/hooks/useState/Challenge";
+import { RegistrationReactForm } from "./Components/hooks/useState/RegistrationReactForm";
+import { LoginForm } from "./Components/hooks/useState/LoginForm";
+import { ContactForm } from "./Components/hooks/useState/ContactForm";
 export const App = () =>
 {
   return(
     <>
-    <section className = "Container">
-    <ChallengeofuseState />
-    </section>
+    <ContactForm />
     </>
   )
 }

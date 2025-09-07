@@ -1,0 +1,92 @@
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.OuterFormBody {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+}
+
+.formBody {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 30px 40px;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  width: 100%;
+  max-width: 380px;
+  box-sizing: border-box;
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.formBody label {
+  display: block;
+  margin-bottom: 8px;
+  color: #fff;
+  font-weight: 500;
+  font-size: 20px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.userInput {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 15px;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.userInput::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.userInput:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  background: #ffffff;
+  border: none;
+  border-radius: 8px;
+  color: #66a6ff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #f0faff;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+button[type="submit"]:active {
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}

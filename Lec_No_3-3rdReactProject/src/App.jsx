@@ -4,11 +4,13 @@ import { ContactForm } from "./Components/hooks/useState/ContactForm";
 import { ReactuseEffect } from "./Components/hooks/useEffect/index";
 import { ReactuseEffectChallenge } from "./Components/hooks/useEffect/useEffectChallenge";
 import { CleanUp } from "./Components/hooks/useEffect/CleanUp";
+import { UseRef } from "./Components/hooks/useRefs";
+import { UseId } from "./Components/hooks/useID";
 export const App = () =>
 {
   return(
     <>
-    <CleanUp  />
+    <UseId  />
     </>
   )
 }

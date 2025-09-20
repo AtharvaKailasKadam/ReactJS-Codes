@@ -6,11 +6,12 @@ import { ReactuseEffectChallenge } from "./Components/hooks/useEffect/useEffectC
 import { CleanUp } from "./Components/hooks/useEffect/CleanUp";
 import { UseRef } from "./Components/hooks/useRefs";
 import { UseId } from "./Components/hooks/useID";
+import { ParentComponent } from "./Components/PropDrilling";
 export const App = () =>
 {
   return(
     <>
-    <UseId  />
+    <ParentComponent/>
     </>
   )
 }

@@ -7,11 +7,13 @@ import { CleanUp } from "./Components/hooks/useEffect/CleanUp";
 import { UseRef } from "./Components/hooks/useRefs";
 import { UseId } from "./Components/hooks/useID";
 import { ParentComponent } from "./Components/PropDrilling";
+import { BioProvider } from "./Components/hooks/ContextAPI";
+import { Home } from "./Components/hooks/ContextAPI/Home";
 export const App = () =>
 {
   return(
-    <>
-    <ParentComponent/>
-    </>
+    <BioProvider>
+      <Home />
+    </BioProvider>
   )
 }

@@ -8,12 +8,11 @@ import { UseRef } from "./Components/hooks/useRefs";
 import { UseId } from "./Components/hooks/useID";
 import { ParentComponent } from "./Components/PropDrilling";
 import { BioProvider } from "./Components/hooks/ContextAPI";
-import { Home } from "./Components/hooks/ContextAPI/Home";
+import { Home } from "./Components/hooks/ContextAPI/Home";import { ReducerComp } from "./Components/hooks/useReducer";
+;
 export const App = () =>
 {
-  return(
-    <BioProvider>
-      <Home />
-    </BioProvider>
+  return (
+    <ReducerComp />
   )
 }

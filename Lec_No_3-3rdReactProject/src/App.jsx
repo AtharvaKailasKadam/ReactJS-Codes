@@ -9,10 +9,11 @@ import { UseId } from "./Components/hooks/useID";
 import { ParentComponent } from "./Components/PropDrilling";
 import { BioProvider } from "./Components/hooks/ContextAPI";
 import { Home } from "./Components/hooks/ContextAPI/Home";import { ReducerComp } from "./Components/hooks/useReducer";
+import UseCallBack from "./Components/hooks/useCallBack/useCallBack";
 ;
 export const App = () =>
 {
   return (
-    <ReducerComp />
+    <UseCallBack />
   )
 }
